@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>График смен</title>
+  <meta name="theme-color" content="#10b981">
+  <script src="https://tailwindcss.com"></script>
+  <script src="https://jsdelivr.net"></script>
+  <style>
+    body { -webkit-tap-highlight-color: transparent; background-color: #f3f4f6; }
+  </style>
+</head>
+<body class="text-gray-800 pb-20">
+
+  <!-- Шапка -->
+  <header class="bg-emerald-600 text-white p-4 shadow-md sticky top-0 z-10">
+    <div class="max-w-md mx-auto flex justify-between items-center">
+      <div>
+        <h1 class="text-xl font-bold">График смен</h1>
+        <p class="text-xs text-emerald-100">Общее расписание команды</p>
+      </div>
+      <input type="month" id="monthFilter" class="bg-emerald-700 text-white text-sm rounded-lg px-2 py-1.5 border border-emerald-500 outline-none">
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto p-4 space-y-5">
+
+    <!-- Сводка часов по сотрудникам -->
+    <section class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Итого часов за месяц</h2>
+      <div id="statsList" class="grid grid-cols-2 gap-2 text-sm">
+        <div class="text-gray-400 col-span-2 text-center py-2">Загрузка данных...</div>
+      </div>
+    </section>
+
+    <!-- Кнопка открыть форму -->
+    <button id="toggleFormBtn" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-3.5 rounded-2xl shadow-md transition flex items-center justify-center gap-2">
+      <span class="text-xl leading-none">+</span> Добавить смену
+    </button>
+
+    <!-- Форма добавления смены -->
+    <section id="addFormCard" class="hidden bg-white rounded-2xl p-4 shadow-md border border-emerald-100 space-y-3">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-gray-800">Новая смена</h3>
+        <button id="closeFormBtn" class="text-gray-400 hover:text-gray-600 text-lg px-2">✕</button>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Кто выходит на смену?</label>
+        <div class="flex gap-2">
+          <select id="employeeSelect" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500">
+            <option value="">Выберите из списка...</option>
+          </select>
+        </div>
+        <input type="text" id="newEmployeeInput" placeholder="Или впишите новое имя..." class="mt-2 w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500">
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Дата смены</label>
+        <input type="date" id="shiftDate" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500">
+      </div>
+
+      <div class="grid grid-cols-3 gap-2">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Начало</label>
+          <input type="time" id="startTime" value="09:00" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-sm outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Конец</label>
+          <input type="time" id="endTime" value="18:00" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2 text-sm outline-none focus:border-emerald-500">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Часов</label>
+          <input type="number" step="0.5" id="hoursInput" value="9" class="w-full bg-emerald-50 border border-emerald-200 font-bold text-emerald-800 rounded-xl p-2 text-sm outline-none">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Комментарий (необязательно)</label>
+        <input type="text" id="commentInput" placeholder="Например: утренняя, замена, стажировка" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:border-emerald-500">
+      </div>
+
+      <button id="saveShiftBtn" class="w-full bg-emerald-600 active:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow transition">
+        Сохранить в график
+      </button>
+    </section>
+
+    <!-- Список смен -->
+    <section class="space-y-3">
+      <div class="flex justify-between items-center px-1">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Расписание смен</h2>
+        <button onclick="loadShifts()" class="text-xs text-emerald-600 font-medium">↻ Обновить</button>
+      </div>
+      <div id="shiftsList" class="space-y-2.5">
+        <div class="text-center text-gray-400 py-6 text-sm">Загружаем расписание...</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://cljevafdxvoeoxprdsox.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_hEIvRVziot6qdNEPmph-zQ_5GODkAN7';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Имена по умолчанию (можно поменять на свои)
+    const DEFAULT_EMPLOYEES = ['Сотрудник 1', 'Сотрудник 2', 'Сотрудник 3', 'Сотрудник 4', 'Сотрудник 5', 'Сотрудник 6'];
+
+    const monthFilter = document.getElementById('monthFilter');
+    const shiftDateInput = document.getElementById('shiftDate');
+    const startTimeInput = document.getElementById('startTime');
+    const endTimeInput = document.getElementById('endTime');
+    const hoursInput = document.getElementById('hoursInput');
+    const employeeSelect = document.getElementById('employeeSelect');
+    const newEmployeeInput = document.getElementById('newEmployeeInput');
+    const commentInput = document.getElementById('commentInput');
+    const addFormCard = document.getElementById('addFormCard');
+
+    // Установка текущей даты и месяца
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    monthFilter.value = `${yyyy}-${mm}`;
+    shiftDateInput.value = `${yyyy}-${mm}-${dd}`;
+
+    // Автоподсчет часов при изменении времени
+    function calculateHours() {
+      if (!startTimeInput.value || !endTimeInput.value) return;
+      const [sh, sm] = startTimeInput.value.split(':').map(Number);
+      const [eh, em] = endTimeInput.value.split(':').map(Number);
+      let diff = (eh + em / 60) - (sh + sm / 60);
+      if (diff <= 0) diff += 24; // если смена переходит через полночь
+      hoursInput.value = Math.round(diff * 10) / 10;
+    }
+    startTimeInput.addEventListener('change', calculateHours);
+    endTimeInput.addEventListener('change', calculateHours);
+
+    // Открытие/закрытие формы
+    document.getElementById('toggleFormBtn').addEventListener('click', () => {
+      addFormCard.classList.remove('hidden');
+      const savedName = localStorage.getItem('my_shift_name');
+      if (savedName) employeeSelect.value = savedName;
+    });
+    document.getElementById('closeFormBtn').addEventListener('click', () => {
+      addFormCard.classList.add('hidden');
+    });
+
+    // Форматирование даты
+    function formatDateRu(dateStr) {
+      const [y, m, d] = dateStr.split('-');
+      const date = new Date(y, m - 1, d);
+      const days = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+      const months = ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+      return `${Number(d)} ${months[date.getMonth()]} (${days[date.getDay()]})`;
+    }
+
+    // Загрузка данных из Supabase
+    async function loadShifts() {
+      const selectedMonth = monthFilter.value;
+      const startOfMonth = `${selectedMonth}-01`;
+      const [y, m] = selectedMonth.split('-').map(Number);
+      const lastDay = new Date(y, m, 0).getDate();
+      const endOfMonth = `${selectedMonth}-${String(lastDay).padStart(2, '0')}`;
+
+      const { data, error } = await db
+        .from('shifts')
+        .select('*')
+        .gte('shift_date', startOfMonth)
+        .lte('shift_date', endOfMonth)
+        .order('shift_date', { ascending: true })
+        .order('start_time', { ascending: true });
+
+      if (error) {
+        alert('Ошибка загрузки: ' + error.message);
+        return;
+      }
+
+      renderStatsAndEmployees(data);
+      renderShiftsList(data);
+    }
+
+    // Отрисовка статистики и списка имен
+    function renderStatsAndEmployees(shifts) {
+      const stats = {};
+      const namesSet = new Set(DEFAULT_EMPLOYEES);
+
+      shifts.forEach(s => {
+        namesSet.add(s.employee_name);
+        stats[s.employee_name] = (stats[s.employee_name] || 0) + Number(s.hours);
+      });
+
+      // Обновляем выпадающий список
+      const currentVal = employeeSelect.value || localStorage.getItem('my_shift_name') || '';
+      employeeSelect.innerHTML = '<option value="">Выберите имя...</option>';
+      Array.from(namesSet).forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        employeeSelect.appendChild(opt);
+      });
+      if (currentVal) employeeSelect.value = currentVal;
+
+      // Отрисовка карточек статистики
+      const statsList = document.getElementById('statsList');
+      const entries = Object.entries(stats).sort((a, b) => b[1] - a[1]);
+
+      if (entries.length === 0) {
+        statsList.innerHTML = '<div class="text-gray-400 col-span-2 text-center py-2 text-xs">В этом месяце смен пока нет</div>';
+        return;
+      }
+
+      statsList.innerHTML = entries.map(([name, totalHours]) => `
+        <div class="bg-gray-50 rounded-xl p-2.5 flex justify-between items-center border border-gray-100">
