@@ -121,7 +121,7 @@ function render(){
   const st={},ns=new Set(EMPS);EMPS.forEach(e=>st[e]=0);
   data.forEach(s=>{ns.add(s.employee_name);st[s.employee_name]=(st[s.employee_name]||0)+Number(s.hours)});
   const cur=$('esel').value;$('esel').innerHTML='<option value="">Выберите...</option>'+Array.from(ns).map(n=>`<option value="${n}">${n}</option>`).join('');if(cur)$('esel').value=cur;
-  $('stl').innerHTML=Object.entries(st).map(([n,h])=>`<div class="st ${cls(n)}" onclick="setF('${n}')"><span>${n}</span><span>${h} ч</span></div>`).join('');
+  $('stl').innerHTML=Object.entries(st).map(([n,h])=>`<div class="st ${cls(n)}" onclick="setF('${n}')"><span>${n}</span><span>${h} ч • ${h*150} ₽</span></div>`).join('');
   const fl=flt==='ALL'?data:data.filter(s=>s.employee_name===flt);
   $('list').innerHTML=fl.length?fl.map(s=>`<div class="sc"><div><div class="top"><span class="db">${fmt(s.shift_date)}</span><span class="eb ${cls(s.employee_name)}">${s.employee_name}</span>${s.comment?`<span class="tg">${s.comment}</span>`:''}</div><div class="tm">🕒 ${s.start_time||'--:--'}–${s.end_time||'--:--'} • <b>${s.hours} ч</b></div></div><div class="acts"><button onclick="editS(${s.id})" class="ib ebtn">✏️</button><button onclick="delS(${s.id})" class="ib dbtn">✕</button></div></div>`).join(''):'<div class="card msg">Смен нет</div>';
 }
