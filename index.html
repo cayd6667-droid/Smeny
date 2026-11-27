@@ -115,7 +115,7 @@ async function load(){
   try{
     const r=await fetch(`${URL}?select=*&shift_date=gte.${$('mf').value}-01&shift_date=lte.${$('mf').value}-${String(ld).padStart(2,'0')}&order=shift_date.asc,hours.asc`,{headers:HDR});
     data=await r.json();render();
-  }catch(e){$('list').innerHTML='<div class="card msg">Ошибка сети</div>'}
+  }catch(e){$('list').innerHTML='<div class="card msg">'+e.message+'</div>'}
 }
 function render(){
   const st={},ns=new Set(EMPS);EMPS.forEach(e=>st[e]=0);
