@@ -114,7 +114,7 @@ async function load(){
   const[y,m]=$('mf').value.split('-').map(Number),ld=new Date(y,m,0).getDate();
   try{
     const r=await fetch(`${URL}?select=*&shift_date=gte.${$('mf').value}-01&shift_date=lte.${$('mf').value}-${String(ld).padStart(2,'0')}&order=shift_date.asc,hours.asc`,{headers:HDR});
-    data=await r.json();render();
+    data=await r.json();if(!Array.isArray(data))throw new Error(data.message||JSON.stringify(data));render();
   }catch(e){$('list').innerHTML='<div class="card msg">'+e.message+'</div>'}
 }
 function render(){
