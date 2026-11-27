@@ -1,187 +1,139 @@
-АЗС «ОКТАН-24»
+АЗС ОКТАН №24
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>АЗС «ОКТАН-24» — График смен</title>
-  <meta name="theme-color" content="#1e293b">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body { background: #f1f5f9; color: #1e293b; padding-bottom: 60px; }
-    header { background: #1e293b; color: #fff; padding: 16px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.18); }
-    .header-inner { max-width: 500px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    h1 { font-size: 18px; font-weight: 800; letter-spacing: 0.02em; }
-    .subtitle { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-    input[type="month"] { background: #334155; color: #fff; border: 1px solid #475569; border-radius: 10px; padding: 6px 10px; font-size: 14px; outline: none; }
-    main { max-width: 500px; margin: 0 auto; padding: 14px; display: flex; flex-direction: column; gap: 14px; }
-    .card { background: #fff; border-radius: 16px; padding: 15px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; }
-    .section-title { font-size: 12px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat-item { border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; border: 1px solid transparent; cursor: pointer; }
-    .stat-name { font-weight: 700; }
-    .stat-badge { font-weight: 800; padding: 3px 8px; border-radius: 8px; font-size: 12px; background: rgba(255,255,255,0.75); }
-    
-    .emp-alex { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .emp-serg { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
-    .emp-phil { background: #fffbeb; color: #b45309; border-color: #fde68a; }
-    .emp-pavel { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
-    .emp-other { background: #f8fafc; color: #334155; border-color: #e2e8f0; }
-
-    .btn-primary { width: 100%; background: #059669; color: #fff; border: none; border-radius: 14px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 10px rgba(5,150,105,0.22); display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-edit-mode { background: #2563eb; box-shadow: 0 4px 10px rgba(37,99,235,0.22); }
-    .hidden { display: none !important; }
-    .form-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px; }
-    .close-btn { background: none; border: none; font-size: 18px; color: #94a3b8; padding: 4px 8px; cursor: pointer; }
-    .field { margin-bottom: 11px; }
-    label { display: block; font-size: 12px; font-weight: 600; color: #64748b; margin-bottom: 4px; }
-    input, select { width: 100%; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 11px; padding: 10px 12px; font-size: 15px; color: #0f172a; outline: none; }
-    .mt-2 { margin-top: 8px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-    .hours-box { background: #ecfdf5; border-color: #6ee7b7; color: #065f46; font-weight: 800; }
-    
-    .filter-pills { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-    .pill { border: 1px solid #cbd5e1; background: #fff; color: #475569; border-radius: 20px; padding: 6px 12px; font-size: 13px; font-weight: 600; white-space: nowrap; cursor: pointer; }
-    .pill.active { background: #1e293b; color: #fff; border-color: #1e293b; }
-
-    .shift-card { background: #fff; border-radius: 15px; padding: 13px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; gap: 8px; }
-    .shift-top { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; flex-wrap: wrap; }
-    .date-badge { background: #f1f5f9; color: #334155; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
-    .emp-badge { font-weight: 700; font-size: 13px; padding: 3px 9px; border-radius: 6px; border: 1px solid transparent; }
-    .type-tag { font-size: 11px; font-weight: 600; color: #64748b; background: #f8fafc; padding: 2px 6px; border-radius: 5px; border: 1px solid #e2e8f0; }
-    .shift-time { font-size: 13px; color: #475569; }
-    .actions { display: flex; gap: 6px; flex-shrink: 0; }
-    .edit-btn { background: #dbeafe; color: #1d4ed8; border: none; border-radius: 10px; width: 34px; height: 34px; font-size: 15px; cursor: pointer; }
-    .del-btn { background: #fee2e2; color: #dc2626; border: none; border-radius: 10px; width: 34px; height: 34px; font-size: 15px; cursor: pointer; }
-    .empty-msg { text-align: center; color: #94a3b8; font-size: 14px; padding: 20px 10px; grid-column: span 2; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>АЗС «ОКТАН-24»</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
+body{background:#f1f5f9;color:#1e293b;padding-bottom:50px}
+header{background:#1e293b;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:18px;font-weight:800}.sub{font-size:11px;color:#94a3b8}
+input[type=month]{background:#334155;color:#fff;border:1px solid #475569;border-radius:10px;padding:6px 8px;font-size:14px}
+main{max-width:500px;margin:0 auto;padding:14px;display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border-radius:16px;padding:14px;border:1px solid #e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.ttl{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st{border-radius:11px;padding:9px 11px;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;border:1px solid transparent;cursor:pointer}
+.st span:last-child{background:rgba(255,255,255,.8);padding:2px 7px;border-radius:7px;font-size:12px}
+.c-alex{background:#eff6ff;color:#1d4ed8;border-color:#bfdbfe}
+.c-serg{background:#ecfdf5;color:#047857;border-color:#a7f3d0}
+.c-phil{background:#fffbeb;color:#b45309;border-color:#fde68a}
+.c-pavel{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
+.c-oth{background:#f8fafc;color:#334155;border-color:#e2e8f0}
+.btn{width:100%;background:#059669;color:#fff;border:none;border-radius:13px;padding:13px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-blue{background:#2563eb}.hide{display:none!important}
+.fld{margin-bottom:10px}label{display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:4px}
+input,select{width:100%;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:9px 11px;font-size:15px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.pill{border:1px solid #cbd5e1;background:#fff;color:#475569;border-radius:20px;padding:6px 12px;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer}
+.pill.act{background:#1e293b;color:#fff;border-color:#1e293b}
+.sc{background:#fff;border-radius:14px;padding:12px 14px;border:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}
+.top{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap}
+.db{background:#f1f5f9;font-size:12px;font-weight:700;padding:2px 7px;border-radius:6px}
+.eb{font-weight:700;font-size:12px;padding:2px 8px;border-radius:6px}
+.tg{font-size:11px;color:#64748b;background:#f8fafc;padding:2px 6px;border-radius:5px;border:1px solid #e2e8f0}
+.tm{font-size:13px;color:#475569}.acts{display:flex;gap:5px}
+.ib{border:none;border-radius:9px;width:32px;height:32px;font-size:14px;cursor:pointer}
+.ebtn{background:#dbeafe;color:#1d4ed8}.dbtn{background:#fee2e2;color:#dc2626}
+.msg{text-align:center;color:#94a3b8;font-size:13px;padding:16px;grid-column:span 2}
+</style>
 </head>
 <body>
-
-  <header>
-    <div class="header-inner">
-      <div>
-        <h1>АЗС «ОКТАН-24»</h1>
-        <div class="subtitle">График смен и учет часов</div>
-      </div>
-      <input type="month" id="monthFilter">
+<header>
+  <div><h1>АЗС «ОКТАН-24»</h1><div class="sub">График смен и учет часов</div></div>
+  <input type="month" id="mf">
+</header>
+<main>
+  <section class="card"><div class="ttl">Итого часов за месяц</div><div id="stl" class="grid2"><div class="msg">Загрузка...</div></div></section>
+  <button id="tbtn" class="btn">+ Добавить смену</button>
+  <section id="fcard" class="card hide">
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px"><strong id="fttl">Новая смена</strong><button id="cbtn" style="border:none;background:none;font-size:18px;color:#94a3b8">✕</button></div>
+    <input type="hidden" id="eid">
+    <div class="fld"><label>Сотрудник</label><select id="esel"></select><input id="enew" placeholder="Или впишите новое имя..." style="margin-top:6px"></div>
+    <div class="fld"><label>Дата</label><input type="date" id="sdate"></div>
+    <div class="fld grid3">
+      <div><label>Начало</label><input type="time" id="st" value="08:00"></div>
+      <div><label>Конец</label><input type="time" id="et" value="08:00"></div>
+      <div><label>Часов</label><input type="number" step="0.5" id="hrs" value="24" style="background:#ecfdf5;font-weight:800"></div>
     </div>
-  </header>
+    <div class="fld"><label>Тип смены</label><input id="cmt" value="Основная смена"></div>
+    <button id="sbtn" class="btn">Сохранить</button>
+  </section>
+  <section>
+    <div class="pills" id="pills">
+      <button class="pill act" onclick="setF('ALL')">Все</button>
+      <button class="pill" onclick="setF('Александр')">Александр</button>
+      <button class="pill" onclick="setF('Сергей')">Сергей</button>
+      <button class="pill" onclick="setF('Филипп')">Филипп</button>
+      <button class="pill" onclick="setF('Павел')">Павел</button>
+    </div>
+    <div id="list" style="margin-top:10px"><div class="card msg">Загружаем расписание...</div></div>
+  </section>
+</main>
+<script>
+const URL='https://supabase.co';
+const KEY='sb_publishable_hEIvRVziot6qdNEPmph-zQ_5GODkAN7';
+const HDR={'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};
+const EMPS=['Александр','Сергей','Филипп','Павел'];
+let data=[],flt='ALL';
+const $=id=>document.getElementById(id);
+const d=new Date(),ym=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+$('mf').value=ym;$('sdate').value=`${ym}-${String(d.getDate()).padStart(2,'0')}`;
+const cls=n=>n==='Александр'?'c-alex':n==='Сергей'?'c-serg':n==='Филипп'?'c-phil':n==='Павел'?'c-pavel':'c-oth';
 
-  <main>
-    <section class="card">
-      <div class="section-title">Итого часов за месяц</div>
-      <div id="statsList" class="stats-grid">
-        <div class="empty-msg">Загрузка данных...</div>
-      </div>
-    </section>
+function calc(){
+  if(!$('st').value||!$('et').value)return;
+  const[a,b]=$('st').value.split(':').map(Number),[c,e]=$('et').value.split(':').map(Number);
+  let df=(c+e/60)-(a+b/60);if(df<=0)df+=24;$('hrs').value=Math.round(df*10)/10;
+}
+$('st').onchange=calc;$('et').onchange=calc;
 
-    <button id="toggleFormBtn" class="btn-primary">
-      <span>+</span> Добавить смену
-    </button>
+function setF(e){
+  flt=e;document.querySelectorAll('.pill').forEach(p=>p.classList.toggle('act',(e==='ALL'&&p.textContent==='Все')||p.textContent===e));render();
+}
+function resetF(){
+  $('eid').value='';$('fttl').textContent='Новая смена';$('sbtn').textContent='Сохранить';$('sbtn').classList.remove('btn-blue');
+  $('enew').value='';$('cmt').value='Основная смена';$('st').value='08:00';$('et').value='08:00';$('hrs').value='24';
+}
+$('tbtn').onclick=()=>{resetF();$('fcard').classList.remove('hide')};
+$('cbtn').onclick=()=>{$('fcard').classList.add('hide');resetF()};
 
-    <section id="addFormCard" class="card hidden">
-      <div class="form-header">
-        <strong id="formTitle">Новая смена</strong>
-        <button id="closeFormBtn" class="close-btn">✕</button>
-      </div>
-
-      <input type="hidden" id="editingShiftId" value="">
-
-      <div class="field">
-        <label>Сотрудник</label>
-        <select id="employeeSelect">
-          <option value="">Выберите из списка...</option>
-        </select>
-        <input type="text" id="newEmployeeInput" placeholder="Или впишите новое имя..." class="mt-2">
-      </div>
-
-      <div class="field">
-        <label>Дата смены</label>
-        <input type="date" id="shiftDate">
-      </div>
-
-      <div class="field grid-3">
-        <div>
-          <label>Начало</label>
-          <input type="time" id="startTime" value="08:00">
-        </div>
-        <div>
-          <label>Конец</label>
-          <input type="time" id="endTime" value="08:00">
-        </div>
-        <div>
-          <label>Часов</label>
-          <input type="number" step="0.5" id="hoursInput" value="24" class="hours-box">
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Тип смены / комментарий</label>
-        <input type="text" id="commentInput" placeholder="Например: Основная смена, График 5/2, Замена">
-      </div>
-
-      <button id="saveShiftBtn" class="btn-primary">Сохранить в график</button>
-    </section>
-
-    <section>
-      <div class="filter-pills" id="filterPills">
-        <button class="pill active" onclick="setFilter('ALL')">Все</button>
-        <button class="pill" onclick="setFilter('Александр')">Александр</button>
-        <button class="pill" onclick="setFilter('Сергей')">Сергей</button>
-        <button class="pill" onclick="setFilter('Филипп')">Филипп</button>
-        <button class="pill" onclick="setFilter('Павел')">Павел</button>
-      </div>
-      <div id="shiftsList" style="margin-top: 10px;">
-        <div class="card empty-msg">Загружаем расписание...</div>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    const SUPABASE_URL = 'https://supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_hEIvRVziot6qdNEPmph-zQ_5GODkAN7';
-    const HEADERS = {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation'
-    };
-
-    const DEFAULT_EMPLOYEES = ['Александр', 'Сергей', 'Филипп', 'Павел'];
-    let allLoadedShifts = [];
-    let activeFilter = 'ALL';
-
-    const monthFilter = document.getElementById('monthFilter');
-    const shiftDateInput = document.getElementById('shiftDate');
-    const startTimeInput = document.getElementById('startTime');
-    const endTimeInput = document.getElementById('endTime');
-    const hoursInput = document.getElementById('hoursInput');
-    const employeeSelect = document.getElementById('employeeSelect');
-    const newEmployeeInput = document.getElementById('newEmployeeInput');
-    const commentInput = document.getElementById('commentInput');
-    const addFormCard = document.getElementById('addFormCard');
-    const editingShiftId = document.getElementById('editingShiftId');
-    const formTitle = document.getElementById('formTitle');
-    const saveShiftBtn = document.getElementById('saveShiftBtn');
-
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    monthFilter.value = `${yyyy}-${mm}`;
-    shiftDateInput.value = `${yyyy}-${mm}-${dd}`;
-
-    function getEmpClass(name) {
-      if (name === 'Александр') return 'emp-alex';
-      if (name === 'Сергей') return 'emp-serg';
-      if (name === 'Филипп') return 'emp-phil';
-      if (name === 'Павел') return 'emp-pavel';
-      return 'emp-other';
-    }
-
-    function calculateHours() {
-      if (!startTimeInput.value || !endTimeInput.value) return;
-      const [sh, sm] = startTimeInput.value.split(':').map(Number);
-      const [eh, em] = endTimeInput.value.split(':').map(Number);
-      let diff = (eh + em / 60) - (sh + sm / 60);
-      if (diff <= 0) diff += 24;
+function editS(id){
+  const s=data.find(x=>x.id===id);if(!s)return;
+  $('eid').value=s.id;$('fttl').textContent='Редактировать смену';$('sbtn').textContent='Сохранить изменения';$('sbtn').classList.add('btn-blue');
+  $('esel').value=s.employee_name;$('enew').value='';$('sdate').value=s.shift_date;$('st').value=s.start_time||'08:00';$('et').value=s.end_time||'08:00';$('hrs').value=s.hours;$('cmt').value=s.comment||'';
+  $('fcard').classList.remove('hide');$('fcard').scrollIntoView({behavior:'smooth'});
+}
+function fmt(ds){
+  const[y,m,day]=ds.split('-'),dt=new Date(y,m-1,day);
+  return `${Number(day)} ${['янв','фев','мар','апр','мая','июн','июл','авг','сен','окт','ноя','дек'][dt.getMonth()]} (${['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][dt.getDay()]})`;
+}
+async function load(){
+  const[y,m]=$('mf').value.split('-').map(Number),ld=new Date(y,m,0).getDate();
+  try{
+    const r=await fetch(`${URL}?select=*&shift_date=gte.${$('mf').value}-01&shift_date=lte.${$('mf').value}-${String(ld).padStart(2,'0')}&order=shift_date.asc,hours.asc`,{headers:HDR});
+    data=await r.json();render();
+  }catch(e){$('list').innerHTML='<div class="card msg">Ошибка сети</div>'}
+}
+function render(){
+  const st={},ns=new Set(EMPS);EMPS.forEach(e=>st[e]=0);
+  data.forEach(s=>{ns.add(s.employee_name);st[s.employee_name]=(st[s.employee_name]||0)+Number(s.hours)});
+  const cur=$('esel').value;$('esel').innerHTML='<option value="">Выберите...</option>'+Array.from(ns).map(n=>`<option value="${n}">${n}</option>`).join('');if(cur)$('esel').value=cur;
+  $('stl').innerHTML=Object.entries(st).map(([n,h])=>`<div class="st ${cls(n)}" onclick="setF('${n}')"><span>${n}</span><span>${h} ч</span></div>`).join('');
+  const fl=flt==='ALL'?data:data.filter(s=>s.employee_name===flt);
+  $('list').innerHTML=fl.length?fl.map(s=>`<div class="sc"><div><div class="top"><span class="db">${fmt(s.shift_date)}</span><span class="eb ${cls(s.employee_name)}">${s.employee_name}</span>${s.comment?`<span class="tg">${s.comment}</span>`:''}</div><div class="tm">🕒 ${s.start_time||'--:--'}–${s.end_time||'--:--'} • <b>${s.hours} ч</b></div></div><div class="acts"><button onclick="editS(${s.id})" class="ib ebtn">✏️</button><button onclick="delS(${s.id})" class="ib dbtn">✕</button></div></div>`).join(''):'<div class="card msg">Смен нет</div>';
+}
+$('sbtn').onclick=async()=>{
+  const n=$('enew').value.trim()||$('esel').value,sd=$('sdate').value,h=parseFloat($('hrs').value),id=$('eid').value;
+  if(!n||!sd||isNaN(h))return alert('Заполните поля!');
+  $('sbtn').disabled=true;
+  await fetch(id?`${URL}?id=eq.${id}`:URL,{method:id?'PATCH':'POST',headers:HDR,body:JSON.stringify({employee_name:n,shift_date:sd,start_time:$('st').value,end_time:$('et').value,hours:h,comment:$('cmt').value.trim()})});
+  $('sbtn').disabled=false;$('fcard').classList.add('hide');resetF();load();
+};
+async function delS(id){if(confirm('Удалить?')){await fetch(`${URL}?id=eq.${id}`,{method:'DELETE',headers:HDR});load()}}
+$('mf').onchange=load;load();
+</script>
+</body>
+</html>
